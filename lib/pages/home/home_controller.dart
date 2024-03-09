@@ -86,7 +86,7 @@ class HomeController extends GetxController{
   void updateIsLoading(bool isLoading){
     this.isLoading = isLoading;
     update(["marvel-characters-list"]);
-  }
+  } 
   
   void initScrollListener() {
     scrollController.addListener(() async{
