@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 import 'package:flutter_test_strat_plus/pages/detail/detail_binding.dart';
 import 'package:flutter_test_strat_plus/pages/detail/detail_page.dart';
@@ -6,7 +7,14 @@ import 'package:flutter_test_strat_plus/pages/home/home_binding.dart';
 import 'package:flutter_test_strat_plus/pages/home/home_page.dart';
 import 'package:get/get.dart';
 
-void main() => runApp(const MyApp());
+void main()async{
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Carga las variables de entorno
+  await dotenv.load(fileName: ".env");
+  
+  runApp(const MyApp());
+} 
 
 class MyApp extends StatelessWidget {
 

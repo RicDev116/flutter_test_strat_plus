@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_test_strat_plus/helpers/database_helper.dart';
 import 'package:get/get.dart';
 import 'package:crypto/crypto.dart';
@@ -11,8 +12,9 @@ import 'package:flutter_test_strat_plus/models/marvel_response_model.dart';
 class HomeController extends GetxController{
 
   static const String  _baseMarvelUrl = "https://gateway.marvel.com/v1/public/";
-  static const String _publicKey = "f3ebd959ed825ef6bf1aea1a35bfa608";
-  static const String _privateKey = "5f3bea8834a04fc6eacd89588973d4eb59329f3b";
+  late String _publicKey;
+  late String _privateKey;
+
   late String _timestamp;
   late String _hash;
 
@@ -25,10 +27,12 @@ class HomeController extends GetxController{
   late DatabaseHelper _databaseHelper;
 
   TextEditingController textEditingSearchController = TextEditingController();
+  
 
 
   @override
   void onInit() async{
+    setKeysByEnv();
     initDataBase();
     initScrollListener();
     await getMarvelCharacters(20);
@@ -128,6 +132,15 @@ class HomeController extends GetxController{
     }
     charactersLenght.value = characters.length;
     updateIsLoading(false);
+  }
+  
+  void setKeysByEnv() {
+    try {
+      _publicKey = dotenv.env['PUBLIC_KEY']!;
+      _privateKey = dotenv.env['PRIVATE_KEY']!; 
+    } catch (e) {
+      throw Exception('PUBLIC_KEY no encontrada en las variables de entorno');
+    }
   }
 
 
