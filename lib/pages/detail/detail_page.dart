@@ -15,20 +15,22 @@ class DetailPage extends GetView<DetailController> {
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Image.network(
-              "${controller.character.thumbnail!.path}.${controller.character.thumbnail!.extension}",
-              width: double.infinity,
-              height: 300,
-              fit: BoxFit.fill,
-            ),
-            SizedBox(height: 8),
-            if(controller.character.description.isNotEmpty)Text("Descripción"),
-            if(controller.character.description.isNotEmpty)Text(controller.character.description),
-            //TODO DEMÁS DATOS AQUI!!!,
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Image.network(
+                "${controller.character.thumbnail!.path}.${controller.character.thumbnail!.extension}",
+                width: double.infinity,
+                height: 300,
+                fit: BoxFit.fill,
+              ),
+              const SizedBox(height: 8),
+              if(controller.character.description.isNotEmpty)const Text("Descripción"),
+              if(controller.character.description.isNotEmpty)Text(controller.character.description),
+              //TODO DEMÁS DATOS AQUI!!!,
+            ],
+          ),
         ),
       ),
     );

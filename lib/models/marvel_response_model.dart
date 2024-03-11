@@ -1,10 +1,4 @@
-// To parse this JSON data, do
-//
-//     final marvelResponseModel = marvelResponseModelFromJson(jsonString);
-
 import 'dart:convert';
-
-import 'package:flutter/material.dart';
 
 MarvelResponseModel marvelResponseModelFromJson(String str) => MarvelResponseModel.fromJson(json.decode(str));
 
@@ -55,14 +49,14 @@ class Data {
     int limit;
     int total;
     int count;
-    List<Character> results;
+    List<Character> characters;
 
     Data({
         required this.offset,
         required this.limit,
         required this.total,
         required this.count,
-        required this.results,
+        required this.characters,
     });
 
     factory Data.fromJson(Map<String, dynamic> json) => Data(
@@ -70,7 +64,7 @@ class Data {
         limit: json["limit"],
         total: json["total"],
         count: json["count"],
-        results: List<Character>.from(json["results"].map((x) => Character.fromJson(x))),
+        characters: List<Character>.from(json["results"].map((x) => Character.fromJson(x))),
     );
 
     Map<String, dynamic> toJson() => {
@@ -78,7 +72,7 @@ class Data {
         "limit": limit,
         "total": total,
         "count": count,
-        "results": List<dynamic>.from(results.map((x) => x.toJson())),
+        "results": List<dynamic>.from(characters.map((x) => x.toJson())),
     };
 }
 
@@ -88,12 +82,12 @@ class Character {
     String description;
     String modified;
     Thumbnail? thumbnail;
-    String resourceUri;
-    Comics comics;
-    Comics series;
-    Stories stories;
-    Comics events;
-    List<Url> urls;
+    // String resourceUri;
+    // Comics comics;
+    // Comics series;
+    // Stories stories;
+    // Comics events;
+    // List<Url> urls;
 
     Character({
         required this.id,
@@ -101,12 +95,12 @@ class Character {
         required this.description,
         required this.modified,
         required this.thumbnail,
-        required this.resourceUri,
-        required this.comics,
-        required this.series,
-        required this.stories,
-        required this.events,
-        required this.urls,
+        // required this.resourceUri,
+        // required this.comics,
+        // required this.series,
+        // required this.stories,
+        // required this.events,
+        // required this.urls,
     });
 
     factory Character.fromJson(Map<String, dynamic> json) => Character(
@@ -117,12 +111,25 @@ class Character {
         thumbnail:json["thumbnail"] != null 
           ?Thumbnail.fromJson(json["thumbnail"])
           :null,
-        resourceUri: json["resourceURI"],
-        comics: Comics.fromJson(json["comics"]),
-        series: Comics.fromJson(json["series"]),
-        stories: Stories.fromJson(json["stories"]),
-        events: Comics.fromJson(json["events"]),
-        urls: List<Url>.from(json["urls"].map((x) => Url.fromJson(x))),
+        // resourceUri: json["resourceURI"],
+        // comics: Comics.fromJson(json["comics"]),
+        // series: Comics.fromJson(json["series"]),
+        // stories: Stories.fromJson(json["stories"]),
+        // events: Comics.fromJson(json["events"]),
+        // urls: List<Url>.from(json["urls"].map((x) => Url.fromJson(x))),
+    );
+
+    factory Character.fromJsonDataBase(Map<String, dynamic> json) => Character(
+        id: json["id"],
+        name: json["name"],
+        description: json["description"],
+        modified: json["modified"],
+        thumbnail:json["path"] != null 
+          ?Thumbnail.fromJson({
+            "path":json["path"],
+            "extension":json["extension"],
+          })
+          :null,
     );
 
     Map<String, dynamic> toJson() => {
@@ -131,12 +138,12 @@ class Character {
         "description": description,
         "modified": modified,
         "thumbnail": thumbnail?.toJson(),
-        "resourceURI": resourceUri,
-        "comics": comics.toJson(),
-        "series": series.toJson(),
-        "stories": stories.toJson(),
-        "events": events.toJson(),
-        "urls": List<dynamic>.from(urls.map((x) => x.toJson())),
+        // "resourceURI": resourceUri,
+        // "comics": comics.toJson(),
+        // "series": series.toJson(),
+        // "stories": stories.toJson(),
+        // "events": events.toJson(),
+        // "urls": List<dynamic>.from(urls.map((x) => x.toJson())),
     };
 }
 
@@ -262,7 +269,7 @@ class Thumbnail {
 }
 
 class Url {
-    UrlType type;
+    String type;
     String url;
 
     Url({
@@ -271,27 +278,16 @@ class Url {
     });
 
     factory Url.fromJson(Map<String, dynamic> json) => Url(
-        type: urlTypeValues.map[json["type"]]!,
+        type: json["type"],
         url: json["url"],
     );
 
     Map<String, dynamic> toJson() => {
-        "type": urlTypeValues.reverse[type],
+        "type": type,
         "url": url,
     };
 }
 
-enum UrlType {
-    COMICLINK,
-    DETAIL,
-    WIKI
-}
-
-final urlTypeValues = EnumValues({
-    "comiclink": UrlType.COMICLINK,
-    "detail": UrlType.DETAIL,
-    "wiki": UrlType.WIKI
-});
 
 class EnumValues<T> {
     Map<String, T> map;

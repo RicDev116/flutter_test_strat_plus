@@ -1,6 +1,5 @@
-import 'package:flutter_test_strat_plus/models/MarvelResponseModel.dart';
+import 'package:flutter_test_strat_plus/models/marvel_response_model.dart';
 import 'package:get/get.dart';
-import 'package:get/get_state_manager/get_state_manager.dart';
 
 class DetailController extends GetxController{
 

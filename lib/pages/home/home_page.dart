@@ -13,6 +13,16 @@ class HomePage extends GetView<HomeController> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Personajes de marvel"),
+        bottom: AppBar(
+          title: TextField(
+            controller: controller.textEditingSearchController,
+            decoration: const InputDecoration(
+              hintText: "Buscar nombre",
+            ),
+            onChanged: (value) async => await  controller.searchOnDBByName(),
+            onEditingComplete: () async => await  controller.searchOnDBByName(),
+          ),
+        ),
       ),
       body: GetBuilder<HomeController>(
         id: "marvel-characters-list",
@@ -20,24 +30,30 @@ class HomePage extends GetView<HomeController> {
           return Stack(
             fit: StackFit.expand,
             children: [
-              homeController.marvelResponseModel == null
-              ?Container()
+              homeController.characters.isEmpty
+              ?const Center(
+                child: Text("Sin personajes que mostrar"),
+              )
               :Column(
                 children: [
                   Text("${controller.charactersLenght.value} Personajes Cargados en la lista"),
                   Expanded(
                     child: ListView.builder(
                       controller: homeController.scrollController,
-                      itemCount: homeController.marvelResponseModel!.data.results.length,
+                      itemCount: homeController.characters.length,
                       itemBuilder: (context, index) {
-                        final character = homeController.marvelResponseModel!.data.results[index];
+                        final character = homeController.characters[index];
                         return ListTile(
                           onTap: () => Get.toNamed("/details",arguments: character),
                           leading: character.thumbnail != null
                           ?Image.network(
                             "${character.thumbnail!.path}.${character.thumbnail!.extension}", 
                             width: 50, 
-                            height: 50
+                            height: 50,
+                            loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
+                              if (loadingProgress == null) return child; // La imagen se ha cargado completamente
+                              return  const CircularProgressIndicator();
+                            }
                           )
                           :Container(
                             color: Colors.grey,
@@ -45,7 +61,14 @@ class HomePage extends GetView<HomeController> {
                             height: 50
                           ),
                           title: Text(character.name),
-                          subtitle: Text(character.description),
+                          subtitle: SizedBox(
+                            height: 30,
+                            // color: Colors.yellow,
+                            child: Text(
+                              character.description,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                          ),
                         );
                       },
                     ),

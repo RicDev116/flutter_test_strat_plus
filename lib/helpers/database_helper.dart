@@ -1,25 +1,31 @@
-import 'package:flutter_test_strat_plus/models/MarvelResponseModel.dart';
+import 'dart:developer';
+
+import 'package:flutter_test_strat_plus/models/marvel_response_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
+
+///A singleton class to handle the database
 class DatabaseHelper {
 
-  DatabaseHelper._privateConstructor();
-  
+  DatabaseHelper._privateConstructor(){
+    _initDatabase();
+  }
   static final DatabaseHelper instance = DatabaseHelper._privateConstructor();
 
   Database? _database;
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDatabase();
+    _initDatabase();
     return _database!;
   }
+
 
   _initDatabase() async {
     String path = join(await getDatabasesPath(), 'my_database.db');
     await deleteDatabase(path);
-    return await openDatabase(
+    _database = await openDatabase(
       path, 
       version: 1, 
       onOpen: (db) {
@@ -34,7 +40,6 @@ class DatabaseHelper {
     await createTableCharacters(db);
   }
 
-  // Aquí puedes agregar tus funciones para operaciones en la base de datos
 
   Future<void> createTableThumbnail(Database db) async{
     await db.execute("""
@@ -49,17 +54,18 @@ class DatabaseHelper {
   Future<void> createTableCharacters(Database db)async{
     await db.execute("""
     CREATE TABLE Character (
-      id INTEGER PRIMARY KEY, 
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT, 
       description TEXT, 
       modified TEXT,
+      thumbnailId INTEGER,  
       FOREIGN KEY (thumbnailId) REFERENCES Thumbnail(thumbnailId)  
     )
     """);
   }
 
 
-  Future<int> insertThumbnail(Thumbnail thumbnail,int thumbnailId)async{
+  Future<int> insertThumbnail(Thumbnail thumbnail)async{
     return await _database!.insert(
       "Thumbnail", {
         "path":thumbnail.path,
@@ -68,10 +74,9 @@ class DatabaseHelper {
     );
   }
 
-  Future<int> insertCharacter(Character character,int thumbnailId)async{
+  Future<int> insertCharacter(Character character,int? thumbnailId)async{
     return await _database!.insert(
       "Character", {
-        "id":character.id,
         "name":character.name,
         "description":character.description,
         "modified":character.modified,
@@ -79,5 +84,22 @@ class DatabaseHelper {
       }
     );
   }
+
+
+  ///Query function to get the Characters from DB.
+  ///You can filter the query with [initalId] or by [characterName]
+  ///if no values is setted on this variables, hole the list is returned
+  Future<List<Map<String, dynamic>>> getCharactersWithThumbnails({int? initalId = 0, String? characterName}) async {
+  final query = """
+    SELECT Character.*, Thumbnail.path, Thumbnail.extension
+    FROM Character
+    LEFT JOIN Thumbnail ON Character.thumbnailId = Thumbnail.thumbnailId
+    ${initalId != null?"WHERE character.id > $initalId":""}
+    ${characterName != null?"WHERE character.name LIKE \"%$characterName%\"":""}
+    GROUP BY Character.name
+  """;
+  log(query);
+  return await _database!.rawQuery(query);
+}
   
 }
